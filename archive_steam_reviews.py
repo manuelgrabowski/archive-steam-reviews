@@ -15,7 +15,7 @@ def scrape_steam_reviews(username, download_all):
 
     while True:
         url = base_url + str(page_number)
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         soup = BeautifulSoup(response.content, "html.parser")
         reviews = soup.find_all("div", class_="review_box")
 
@@ -116,7 +116,7 @@ def main():
         help="download all reviews (or just the first page)")
     arg_parser.add_argument(
         '--save',
-        default=True,
+        default=False,
         action='store_true',
         help="save downloaded reviews to filesystem (or print to stdout)")
     args = arg_parser.parse_args()
