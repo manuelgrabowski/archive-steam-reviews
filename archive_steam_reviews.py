@@ -24,7 +24,11 @@ def scrape_steam_reviews(username, download_all):
             break
 
         for review in reviews:
-            game_link = review.find("a", class_="game_capsule_ctn")["href"]
+            steam_link = review.find("a", class_="game_capsule_ctn")["href"]
+            steam_id = steam_link.split('/')[-1]
+            review_link = "https://steamcommunity.com/id/" + \
+                username + "/recommended/" + steam_id + "/"
+
             review_text = md(
                 review.find(
                     "div",
@@ -49,7 +53,8 @@ def scrape_steam_reviews(username, download_all):
                 playtime_at_review = m.group('playtime_at_review')
 
             review_data = {
-                "game_link": game_link,
+                "steam_link": steam_link,
+                "review_link": review_link,
                 "total_playtime": total_playtime,
                 "playtime_at_review": playtime_at_review,
                 "review_text": review_text,
@@ -68,7 +73,7 @@ def scrape_steam_reviews(username, download_all):
 
 
 def print_review(review):
-    print(f"Steam Link: {review['game_link']}")
+    print(f"Steam Link: {review['steam_link']} / {review['review_link']}")
     print(
         f"Review Date: {review['review_date']} (last updated: {review['last_updated']})")
     print(
@@ -78,12 +83,14 @@ def print_review(review):
 
 
 def save_review(review):
-    steam_id = review['game_link'].split('/')[-1]
+    steam_id = review['steam_link'].split('/')[-1]
 
     with open(steam_id + '.md', mode='w', encoding="utf-8") as f:
         f.write('---')
         f.write('\n')
-        f.write('steam_link: ' + review['game_link'])
+        f.write('steam_link: ' + review['steam_link'])
+        f.write('\n')
+        f.write('review_link: ' + review['review_link'])
         f.write('\n')
         f.write('review_date: ' + review['review_date'].strftime("%Y-%m-%d"))
         if review['last_updated']:
